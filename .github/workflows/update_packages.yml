@@ -2,7 +2,10 @@ name: Update packages
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   update_packages:
@@ -20,20 +23,23 @@ jobs:
         run: pacman -S --noconfirm git
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Retrieve version and save as prev
+        run: |
+         sh ./.github/workflows/retrieve_version.sh
+         echo "PREV_VERSION=$VERSION" >> $GITHUB_ENV
       - name: Check and update current packages
         run: sh .github/workflows/update_packages.sh
-      - name: Save tag name
-        run: echo "TAG_NAME=v$(jq -r .version ./version_info.json)" >> $GITHUB_ENV
-      - name: Save version name (Beta x.x.x)
-        run: echo "VERSION_NAME=Beta $(jq -r .version ./version_info.json)" >> $GITHUB_ENV
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v9.1.4
         with:
-          message: "Update packages to ${{ env.VERSION_NAME }}"
+          message: "Update packages to ${{ env.release_name }}"
           add: "."
           author_name: "GitHub Actions"
           author_email: "loraner123@gmail.com"
-          tag: ${{ env.TAG_NAME }}
+          tag: ${{ env.tag_name }}
           tag_push: '--force'
+      - name: Build if new version
+        if: ${{ env.PREV_VERSION }} != ${{ env.VERSION }}
+        uses: ./github/workflows/build.yml
             
     
