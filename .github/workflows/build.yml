@@ -78,7 +78,10 @@ jobs:
           path: dist
 
       - name: Retrieve version
-        run: sh ./.github/workflows/retrieve_version.sh
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq
+          sh ./.github/workflows/retrieve_version.sh
 
       - name: Upload files to a GitHub release
         uses: ncipollo/release-action@v1.13.0

@@ -19,8 +19,8 @@ jobs:
     steps:
       - name: Pacman database update
         run: pacman -Syy --noconfirm
-      - name: Fix Git
-        run: pacman -S --noconfirm git
+      - name: Install deps
+        run: pacman -S --noconfirm git jq
       - name: Checkout
         uses: actions/checkout@v4
       - name: Retrieve version and save as prev
@@ -40,6 +40,7 @@ jobs:
           tag_push: '--force'
       - name: Build if new version
         if: ${{ env.PREV_VERSION }} != ${{ env.VERSION }}
-        uses: ./github/workflows/build.yml
+        uses: ./.github/workflows/build.yml
+
             
     
