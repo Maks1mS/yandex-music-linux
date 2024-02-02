@@ -40,10 +40,10 @@ jobs:
     outputs:
       commited: ${{ steps.commit.outputs.commited }}
     
-    build:
-      needs: update_packages
-      if: needs.update_packages.outputs.commited
-      uses: ./.github/workflows/build.yml
+  build:
+    needs: update_packages
+    if: needs.update_packages.outputs.commited
+    uses: ./.github/workflows/build.yml
 
             
     
