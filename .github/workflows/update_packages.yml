@@ -23,14 +23,13 @@ jobs:
         run: pacman -S --noconfirm git jq
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Retrieve version and save as prev
-        run: |
-         sh ./.github/workflows/retrieve_version.sh
-         echo "PREV_VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Retrieve version
+        run: sh ./.github/workflows/retrieve_version.sh
       - name: Check and update current packages
         run: sh .github/workflows/update_packages.sh
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v9.1.4
+        id: commit
         with:
           message: "Update packages to ${{ env.release_name }}"
           add: "."
@@ -38,9 +37,13 @@ jobs:
           author_email: "loraner123@gmail.com"
           tag: ${{ env.tag_name }}
           tag_push: '--force'
-      - name: Build if new version
-        if: ${{ env.PREV_VERSION }} != ${{ env.VERSION }}
-        uses: ./.github/workflows/build.yml
+    outputs:
+      commited: ${{ steps.commit.outputs.commited }}
+    
+    build:
+      needs: update_packages
+      if: needs.update_packages.outputs.commited
+      uses: ./.github/workflows/build.yml
 
             
     
