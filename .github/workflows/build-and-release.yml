@@ -40,7 +40,7 @@ jobs:
           tag_push: '--force'
   
   build:
-    needs: update_package
+    needs: update_packages
     uses: ./.github/workflows/build.yml
   
   upload-release:
