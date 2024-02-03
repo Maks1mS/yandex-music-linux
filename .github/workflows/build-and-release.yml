@@ -1,4 +1,4 @@
-name: Build
+name: Build and release
 
 on:
   workflow_dispatch:
@@ -42,11 +42,13 @@ jobs:
       new_version: ${{ steps.commit.outputs.commited }}
   
   build:
+    if: ${{ (github.event_name == 'push') || (needs.build.needs.update_packages.new_version) }}
     needs: update_packages
     uses: ./.github/workflows/build.yml
+    with:
+      ref: master
   
   upload-release:
-    if: ${{ (github.event_name == 'push') || (needs.build.needs.update_packages.new_version) }}
     needs: build
     runs-on: ubuntu-latest
     steps:

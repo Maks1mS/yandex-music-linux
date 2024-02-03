@@ -2,6 +2,11 @@ name: Build
 
 on:
   workflow_call:
+    ref:
+      default: ''
+      required: false
+      type: string
+
   pull_request:
     branches:
       - '*'
@@ -15,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ (inputs.ref || '') }}
 
       - name: Build
         run: sh ./.github/workflows/build.sh
@@ -44,6 +51,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ (inputs.ref || '') }}
       
       - name: Install nix
         uses: cachix/install-nix-action@v22
