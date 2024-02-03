@@ -48,7 +48,7 @@ jobs:
     uses: ./.github/workflows/build.yml
   
   upload-release:
-    if: ${{ (github.event_name == 'push') || (steps.update_packages.new_version) }}
+    if: ${{ (github.event_name == 'push') || (needs.build.needs.update_packages.new_version) }}
     needs: build
     runs-on: ubuntu-latest
     steps:
