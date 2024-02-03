@@ -1,0 +1,74 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
+
+
+jobs:
+  update_packages:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: Pacman database update
+        run: pacman -Syy --noconfirm
+
+      - name: Install deps
+        run: pacman -S --noconfirm git jq
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check and update current packages
+        run: sh .github/workflows/update_packages.sh
+
+      - name: Retrieve version
+        run: sh .github/workflows/retrieve_version.sh
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9.1.4
+        id: commit
+        with:
+          message: "Update packages to ${{ env.release_name }}"
+          add: "."
+          author_name: "GitHub Actions"
+          author_email: "loraner123@gmail.com"
+          tag: "${{ env.tag_name }} --force"
+          tag_push: '--force'
+  
+  build:
+    needs: update_package
+    uses: ./.github/workflows/build.yml
+  
+  upload-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: dist
+
+      - name: Retrieve version
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq
+          sh ./.github/workflows/retrieve_version.sh
+
+      - name: Upload files to a GitHub release
+        uses: ncipollo/release-action@v1.13.0
+        with:
+          allowUpdates: true
+          artifacts: dist/*
+          makeLatest: true
+          name: ${{ env.release_name }}
+          replacesArtifacts: true
+          tag: ${{ env.tag_name }}
+        
