@@ -2,10 +2,11 @@ name: Build
 
 on:
   workflow_call:
-    ref:
-      default: ''
-      required: false
-      type: string
+    inputs:
+      ref:
+        default: ''
+        required: false
+        type: string
 
   pull_request:
     branches:
