@@ -38,13 +38,6 @@ jobs:
           add: "."
           author_name: "GitHub Actions"
           author_email: "loraner123@gmail.com"
-
-      - name: Tag Repo
-        uses: richardsimko/update-tag@v1
-        with:
-          tag_name: ${{ env.tag_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
       new_version: ${{ steps.commit.outputs.commited }}
   
@@ -71,6 +64,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install jq
           sh ./.github/workflows/retrieve_version.sh
+      
+      - name: Tag Repo
+        uses: richardsimko/update-tag@v1
+        with:
+          tag_name: ${{ env.tag_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload files to a GitHub release
         uses: ncipollo/release-action@v1.13.0
