@@ -2,6 +2,8 @@ name: Build
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
   push:
     branches:
       - 'master'
@@ -38,12 +40,15 @@ jobs:
           author_email: "loraner123@gmail.com"
           tag: "${{ env.tag_name }} --force"
           tag_push: '--force'
+    outputs:
+      new_version: ${{ steps.commit.outputs.commited }}
   
   build:
     needs: update_packages
     uses: ./.github/workflows/build.yml
   
   upload-release:
+    if: ${{ (github.event_name == 'push') || (steps.update_packages.new_version) }}
     needs: build
     runs-on: ubuntu-latest
     steps:
