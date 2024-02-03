@@ -1,4 +1,4 @@
-# yandex-music-linux
+# yandex-music-linux test
 
 Нативный клиент Яндекс Музыки для Linux. Создан с помощью перепаковки бета-версии клиента для OSX/Windows.
 
